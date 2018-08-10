@@ -19,9 +19,9 @@ More information related to model training and performance can be found on the [
 
 ### [3. Linear regression](#linear-regression)
 
-   #### Linear regression / Linear regression with encoded variables
-   #### Lasso
-   #### Gradient Boosted Trees
+#### Linear regression / Linear regression with encoded variables
+#### Lasso
+#### Gradient Boosted Trees
 
 ### [4. Artificial neuronetwork](#artificial-neuronetwork)
 
