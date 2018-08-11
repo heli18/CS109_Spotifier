@@ -479,4 +479,324 @@ xgbr.score(X_train, y_train)
 ```
 
 ### Artificial Neuronetwork
+```python
+def get_matrix(data, no_interaction):
+    num_user = len(data['user'].unique())
+    num_track = len(data['track'].unique())
+    data_matrix = sp.dok_matrix((num_user, num_track), dtype=np.float32)
+    for u, t in zip(data['user'], data['track']):
+        data_matrix[u, t] = 1.0
+    return num_user, num_track, data_matrix
+#get the random features
+#input: the data matrix
+#output: the desighed user, track input and response variable
+def get_features(data_matrix):
+    num_user, num_track = data_matrix.shape
+    user_data, track_data, y_data = [],[],[]
+    
+    for (u, i) in data_matrix.keys():
+        user_data.append(u)
+        track_data.append(i)
+        y_data.append(1)
+        
+        for t in range(no_interaction):
+            j = np.random.randint(num_track)
+            while (u,j) in data_matrix:
+                j = np.random.randint(num_user)
+            user_data.append(u)
+            track_data.append(j)
+            y_data.append(0)
+                
+    return user_data, track_data, y_data
+#build the model
+def build_model(num_user, num_track, latent_dim):
+    user_train = Input(shape=(1,), dtype='int32', name = 'user_train')
+    track_train = Input(shape=(1,), dtype='int32', name = 'track_train')
+
+    MF_Embedding_user = Embedding(input_dim = num_user, output_dim = latent_dim, embeddings_initializer='uniform', embeddings_regularizer = l2([0,0][0]), input_length=1)
+    MF_Embedding_track = Embedding(input_dim = num_track, output_dim = latent_dim, embeddings_initializer='uniform', embeddings_regularizer = l2([0,0][0]), input_length=1)   
+    
+    user_latent = Flatten()(MF_Embedding_user(user_train))
+    track_latent = Flatten()(MF_Embedding_track(track_train))
+
+    predictor = add([user_latent, track_latent])
+    prediction = Dense(1, activation="sigmoid", name="prediction", kernel_initializer="lecun_uniform")(predictor)
+    NNmodel = Model(inputs=[user_train, track_train], outputs=prediction)
+    return NNmodel
+#get matrix
+no_interaction = 1
+num_user, num_track, matrix = get_matrix(data_adjust, no_interaction)
+user, track, y = get_features(matrix)
+data_nn = pd.DataFrame(user, columns=['user'])
+data_nn['track'] = track
+data_nn['y'] = y
+
+#get train and test data
+data_copy = data_nn.copy()
+data_test = pd.DataFrame(columns=['user', 'track', 'y'])
+for n in range(n_adjust*900, n_adjust*1000):
+    data_hide = data_copy[data_copy.user == n].iloc[0:2]
+    data_test = data_test.append(data_hide)
+    
+data_train = data_copy.drop(data_test.index)
+
+user_train = data_train.user
+track_train = data_train.track
+y_train = data_train.y
+
+user_test = data_test.user
+track_test = data_test.track
+y_test = data_test.y
+
+#define parameter range
+latent_dims = [1, 2, 3, 4, 5, 10, 15, 20, 25, 30, 35, 40, 50, 60, 70, 80, 100]
+learning_rates = [0.0001, 0.0005, 0.001, 0.005, 0.01, 0.05, 0.1, 0.5]
+epochss = [3, 20]
+```
+
+#### Latent Dimension Selection
+```python
+learning_rate = learning_rates[1]
+epochs = epochss[0]
+latent_dim_list, train_score_list, test_score_list = [], [], []
+for latent_dim in latent_dims:
+    NNmodel = build_model(num_user, num_track, latent_dim)
+    NNmodel.compile(optimizer=Adam(lr=learning_rate), loss='binary_crossentropy', metrics=['accuracy'])
+    NNmodel.fit([np.array(user_train), np.array(track_train)], np.array(y_train), epochs=epochs, batch_size=200, validation_split = .2)
+    NN_train_score = NNmodel.evaluate([np.array(user_train), np.array(track_train)], np.array(y_train))[1]
+    NN_test_score = NNmodel.evaluate([np.array(user_test), np.array(track_test)], np.array(y_test))[1]
+    latent_dim_list.append(latent_dim)
+    train_score_list.append(NN_train_score)
+    test_score_list.append(NN_test_score)
+```
+```
+Train on 104548 samples, validate on 26138 samples
+Epoch 1/3
+104548/104548 [==============================] - 1s 12us/step - loss: 0.6927 - acc: 0.5136 - val_loss: 0.6915 - val_acc: 0.5341
+Epoch 2/3
+104548/104548 [==============================] - 1s 5us/step - loss: 0.6877 - acc: 0.5836 - val_loss: 0.6880 - val_acc: 0.5595
+Epoch 3/3
+104548/104548 [==============================] - 1s 5us/step - loss: 0.6784 - acc: 0.6439 - val_loss: 0.6829 - val_acc: 0.5735
+130686/130686 [==============================] - 2s 12us/step
+200/200 [==============================] - 0s 87us/step
+Train on 104548 samples, validate on 26138 samples
+Epoch 1/3
+104548/104548 [==============================] - 1s 9us/step - loss: 0.6922 - acc: 0.5156 - val_loss: 0.6893 - val_acc: 0.5446
+Epoch 2/3
+104548/104548 [==============================] - 1s 7us/step - loss: 0.6810 - acc: 0.6073 - val_loss: 0.6825 - val_acc: 0.5719
+Epoch 3/3
+104548/104548 [==============================] - 1s 7us/step - loss: 0.6627 - acc: 0.6714 - val_loss: 0.6746 - val_acc: 0.5872
+130686/130686 [==============================] - 1s 11us/step
+200/200 [==============================] - 0s 22us/step
+...
+...
+Train on 104548 samples, validate on 26138 samples
+Epoch 1/3
+104548/104548 [==============================] - 21s 198us/step - loss: 0.6870 - acc: 0.5355 - val_loss: 0.6713 - val_acc: 0.5847
+Epoch 2/3
+104548/104548 [==============================] - 19s 183us/step - loss: 0.6220 - acc: 0.6738 - val_loss: 0.6780 - val_acc: 0.5909
+Epoch 3/3
+104548/104548 [==============================] - 21s 199us/step - loss: 0.5653 - acc: 0.7116 - val_loss: 0.7372 - val_acc: 0.5901
+130686/130686 [==============================] - 2s 16us/step
+200/200 [==============================] - 0s 55us/step
+Train on 104548 samples, validate on 26138 samples
+Epoch 1/3
+104548/104548 [==============================] - 24s 232us/step - loss: 0.6867 - acc: 0.5357 - val_loss: 0.6690 - val_acc: 0.5925
+Epoch 2/3
+104548/104548 [==============================] - 23s 222us/step - loss: 0.6184 - acc: 0.6742 - val_loss: 0.6813 - val_acc: 0.5903
+Epoch 3/3
+104548/104548 [==============================] - 23s 221us/step - loss: 0.5632 - acc: 0.7120 - val_loss: 0.7406 - val_acc: 0.5883
+130686/130686 [==============================] - 2s 18us/step
+200/200 [==============================] - 0s 27us/step
+```
+#### Learning Rage Selection
+```python
+latent_dim = 10
+epochs = epochss[0]
+learning_rate_list, train_score_list, test_score_list = [], [], []
+for learning_rate in learning_rates:
+    NNmodel = build_model(num_user, num_track, latent_dim)
+    NNmodel.compile(optimizer=Adam(lr=learning_rate), loss='binary_crossentropy', metrics=['accuracy'])
+    NNmodel.fit([np.array(user_train), np.array(track_train)], np.array(y_train), epochs=epochs, batch_size=200, validation_split = .2)
+    NN_train_score = NNmodel.evaluate([np.array(user_train), np.array(track_train)], np.array(y_train))[1]
+    NN_test_score = NNmodel.evaluate([np.array(user_test), np.array(track_test)], np.array(y_test))[1]
+    learning_rate_list.append(learning_rate)
+    train_score_list.append(NN_train_score)
+    test_score_list.append(NN_test_score)
+```
+
+```
+Train on 104548 samples, validate on 26138 samples
+Epoch 1/3
+104548/104548 [==============================] - 3s 27us/step - loss: 0.6930 - acc: 0.5051 - val_loss: 0.6923 - val_acc: 0.5184
+Epoch 2/3
+104548/104548 [==============================] - 2s 20us/step - loss: 0.6906 - acc: 0.5512 - val_loss: 0.6910 - val_acc: 0.5389
+Epoch 3/3
+104548/104548 [==============================] - 2s 19us/step - loss: 0.6873 - acc: 0.5958 - val_loss: 0.6892 - val_acc: 0.5540
+130686/130686 [==============================] - 2s 17us/step
+200/200 [==============================] - 0s 24us/step
+Train on 104548 samples, validate on 26138 samples
+Epoch 1/3
+104548/104548 [==============================] - 3s 30us/step - loss: 0.6908 - acc: 0.5279 - val_loss: 0.6855 - val_acc: 0.5675
+Epoch 2/3
+104548/104548 [==============================] - 2s 22us/step - loss: 0.6652 - acc: 0.6525 - val_loss: 0.6684 - val_acc: 0.5883
+Epoch 3/3
+104548/104548 [==============================] - 2s 22us/step - loss: 0.6178 - acc: 0.7065 - val_loss: 0.6638 - val_acc: 0.5914
+130686/130686 [==============================] - 2s 17us/step
+200/200 [==============================] - 0s 26us/step
+...
+...
+Train on 104548 samples, validate on 26138 samples
+Epoch 1/3
+104548/104548 [==============================] - 3s 30us/step - loss: 0.6989 - acc: 0.5325 - val_loss: 0.6749 - val_acc: 0.5800
+Epoch 2/3
+104548/104548 [==============================] - 2s 19us/step - loss: 0.6343 - acc: 0.6476 - val_loss: 0.7392 - val_acc: 0.5808
+Epoch 3/3
+104548/104548 [==============================] - 2s 21us/step - loss: 0.5939 - acc: 0.6863 - val_loss: 0.7592 - val_acc: 0.5786
+130686/130686 [==============================] - 2s 16us/step
+200/200 [==============================] - 0s 31us/step
+Train on 104548 samples, validate on 26138 samples
+Epoch 1/3
+104548/104548 [==============================] - 3s 27us/step - loss: 1.0304 - acc: 0.5049 - val_loss: 1.2969 - val_acc: 0.5254
+Epoch 2/3
+104548/104548 [==============================] - 2s 20us/step - loss: 1.1891 - acc: 0.5376 - val_loss: 1.1681 - val_acc: 0.5083
+Epoch 3/3
+104548/104548 [==============================] - 2s 19us/step - loss: 1.2318 - acc: 0.5767 - val_loss: 1.5914 - val_acc: 0.5637
+130686/130686 [==============================] - 2s 17us/step
+200/200 [==============================] - 0s 50us/step
+```
+#### Epochs Selection
+```python
+latent_dim = 10
+learning_rate = 0.001
+epochs = 20
+NNmodel = build_model(num_user, num_track, latent_dim)
+NNmodel.compile(optimizer=Adam(lr=learning_rate), loss='binary_crossentropy', metrics=['accuracy'])
+NNmodel.fit([np.array(user_train), np.array(track_train)], np.array(y_train), epochs=epochs, batch_size=200, validation_split = .2)
+```
+
+```
+Train on 104548 samples, validate on 26138 samples
+Epoch 1/20
+104548/104548 [==============================] - 4s 40us/step - loss: 0.6883 - acc: 0.5331 - val_loss: 0.6731 - val_acc: 0.5827
+Epoch 2/20
+104548/104548 [==============================] - 2s 23us/step - loss: 0.6277 - acc: 0.6727 - val_loss: 0.6668 - val_acc: 0.5945
+...
+...
+Epoch 19/20
+104548/104548 [==============================] - 2s 20us/step - loss: 0.4960 - acc: 0.7457 - val_loss: 1.1711 - val_acc: 0.5887
+Epoch 20/20
+104548/104548 [==============================] - 2s 21us/step - loss: 0.4952 - acc: 0.7469 - val_loss: 1.1909 - val_acc: 0.5884
+```
+#### Create the Final Neural Network Model
+```python
+#Use the optimal parameter and train the final model
+latent_dim = 10
+learning_rate = 0.001
+epochs = 5
+#get matrix of the full dataset
+no_interaction = 1
+num_user, num_track, matrix = get_matrix(data_full, no_interaction)
+user, track, y = get_features(matrix)
+data_nn = pd.DataFrame(user, columns=['user'])
+data_nn['track'] = track
+data_nn['y'] = y
+
+#get train and test data
+data_copy = data_nn.copy()
+data_test = pd.DataFrame(columns=['user', 'track', 'y'])
+for n in range(n_playlist*900, n_playlist*1000):
+    data_hide = data_copy[data_copy.user == n].iloc[0:2]
+    data_test = data_test.append(data_hide)
+    
+data_train = data_copy.drop(data_test.index)
+
+user_train = data_train.user
+track_train = data_train.track
+y_train = data_train.y
+
+user_test = data_test.user
+track_test = data_test.track
+y_test = data_test.y
+#Build the final model
+NNmodel = build_model(num_user, num_track, latent_dim)
+NNmodel.compile(optimizer=Adam(lr=learning_rate), loss='binary_crossentropy', metrics=['accuracy'])
+print(NNmodel.summary())
+```
+
+```
+________
+Layer (type)                    Output Shape         Param #     Connected to                     
+==================================================================================================
+user_train (InputLayer)         (None, 1)            0                                            
+__________________________________________________________________________________________________
+track_train (InputLayer)        (None, 1)            0                                            
+__________________________________________________________________________________________________
+embedding_53 (Embedding)        (None, 1, 10)        100000      user_train[0][0]                 
+__________________________________________________________________________________________________
+embedding_54 (Embedding)        (None, 1, 10)        1329200     track_train[0][0]                
+__________________________________________________________________________________________________
+flatten_53 (Flatten)            (None, 10)           0           embedding_53[0][0]               
+__________________________________________________________________________________________________
+flatten_54 (Flatten)            (None, 10)           0           embedding_54[0][0]               
+__________________________________________________________________________________________________
+add_27 (Add)                    (None, 10)           0           flatten_53[0][0]                 
+                                                                 flatten_54[0][0]                 
+__________________________________________________________________________________________________
+prediction (Dense)              (None, 1)            11          add_27[0][0]                     
+==================================================================================================
+Total params: 1,429,211
+Trainable params: 1,429,211
+Non-trainable params: 0
+__________________________________________________________________________________________________
+None
+
+```
+
+```python
+#Fit the model
+NNmodel.fit([np.array(user_train), np.array(track_train)], np.array(y_train), epochs=epochs, batch_size=200, validation_split = .2)
+NN_train_score = NNmodel.evaluate([np.array(user_train), np.array(track_train)], np.array(y_train))[1]
+NN_test_score = NNmodel.evaluate([np.array(user_test), np.array(track_test)], np.array(y_test))[1]
+```
+
+```
+Train on 1042625 samples, validate on 260657 samples
+Epoch 1/5
+1042625/1042625 [==============================] - 90s 86us/step - loss: 0.5454 - acc: 0.7226 - val_loss: 0.4986 - val_acc: 0.7673
+Epoch 2/5
+1042625/1042625 [==============================] - 89s 85us/step - loss: 0.4562 - acc: 0.7914 - val_loss: 0.5134 - val_acc: 0.7667
+Epoch 3/5
+1042625/1042625 [==============================] - 92s 88us/step - loss: 0.4398 - acc: 0.8005 - val_loss: 0.5287 - val_acc: 0.7653
+Epoch 4/5
+1042625/1042625 [==============================] - 88s 85us/step - loss: 0.4311 - acc: 0.8047 - val_loss: 0.5379 - val_acc: 0.7649
+Epoch 5/5
+1042625/1042625 [==============================] - 93s 89us/step - loss: 0.4254 - acc: 0.8073 - val_loss: 0.5477 - val_acc: 0.7639
+1303282/1303282 [==============================] - 27s 20us/step
+2000/2000 [==============================] - 0s 21us/step
+```
+
+```python
+print('The NN train score is {}'.format(round(NN_train_score, 2)))
+print('The NN test score is {}'.format(round(NN_test_score, 2)))
+```
+
+```
+he NN train score is 0.81
+The NN test score is 0.75
+```
+
+```python
+min_train_score = 1 - np.mean(y_train)
+min_test_score = 1 - np.mean(y_test)
+print('The minimum train score is {}'.format(round(min_train_score, 2)))
+print('The minimum test score is {}'.format(round(min_test_score, 2)))
+
+```
+
+```
+The minimum train score is 0.5
+The minimum test score is 0.5
+```
+
 ### Combined Model
