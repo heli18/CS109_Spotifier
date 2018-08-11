@@ -8,3 +8,5 @@
 # SPOTIFIER! : CS109 DATA SCIENCE FINAL PROJECT
 
 ## Downloads
+
+[Notebook](https://github.com/heli18/CS109_Spotifier/tree/master/files/Spotifier.ipynb)
