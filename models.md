@@ -608,7 +608,7 @@ Epoch 3/3
 130686/130686 [==============================] - 2s 18us/step
 200/200 [==============================] - 0s 27us/step
 ```
-#### Learning Rage Selection
+#### Learning Rate Selection
 ```python
 latent_dim = 10
 epochs = epochss[0]
