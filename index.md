@@ -15,12 +15,12 @@ Playlist generation is one of the major problems in Music Recommender Systems. T
 
 ### Research Goal
 
-This project primarily addresses the question of what the best way to predict user’s track preference is. The primary dataset being used is Million Playlist Dataset. After the visualization and analysis above, we decided to base our prediction on user behavior. Therefore, the main question in this project that we intend to answer is: what predictors in the playlist can well predict the user preference?
+This project primarily addresses the question of what the best way to predict user’s track preference is. The primary dataset being used is Million Playlist Dataset. After the visualization and analysis, we decided to base our prediction on user behavior. Therefore, the main question in this project that we intend to answer is: what predictors in the playlist can well predict the user preference?
 
 ### Research Strategy
 
-We focus our research on the Million Playlist Dataset. The strategy we adopt is based on predicting one playlist by another playlist. We split the whole playlist dataset into two parts: one as our playlist bank where contains a large amount of playlists; the other is called training playlist. We identify a user and his/ her music preference or behaviour based on his/ her playlist. And we hide some of the tracks in the training playlist as the ones we need to predict.
+We focus our research on the Spotify Million Playlist Dataset. The core strategy we adopt is based on the combination of an artificial neuronetwork model, and our baseline model which is based on predicting one playlist by another playlist. Whereas the neuronetwork model utilizes a matrix factorization and latent vector technique to deal with the input of data.
 
-In order to predict the tracks that the users would probably like by looking at the tracks in the playlists that are similar to the user’s existing playlist, we need to define effective predictors in the playlist and compute similarity score between a pair of playlist. We would like to explore dimensional reduction method, such as PCA or classification techniques to determine efficient predictors.
+We split the whole playlist dataset into two parts: one as our playlist bank where contains many playlists; the other is called training playlist. We identify a user and his/ her music preference, or behavior based on his/ her playlist. And we hide some of the tracks in the training playlist as the ones we need to predict.
 
-However, one challenge for only using the million playlist dataset is the “cold start” problem. Since we have no prior playlist to define a user preference. Hence, we would like to address this problem by recommending popular and hot tracks. These tracks can be predicted by looking into the playlists with a huge amount of followers.
+In order to predict the tracks that the users would probably like by looking at the tracks in the playlists that are similar to the user’s existing playlist, we need to define effective predictors in the playlist and compute similarity score between a pair of playlists. The attempts to identify the best predictors for our model are manifested through several models including variations of linear regression and decision tree.
