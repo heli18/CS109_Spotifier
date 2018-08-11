@@ -23,7 +23,7 @@ More information related to model training and performance can be found on the [
 
 ### [5. Gradient Boosted Trees](#gradient-boosted-trees)
 
-### [6. Artificial neuronetwork](#artificial-neuronetwork)
+### [6. Artificial Neural Network](#artificial-neural-network)
 
 ### [7. Combined model](#combined-model)
 Combine baseline and advanced model together to generate the final recommendation list.
@@ -477,7 +477,7 @@ xgbr.score(X_train, y_train)
 0.6763274370298381
 ```
 
-### Artificial Neuronetwork
+### Artificial Neural Network
 ```python
 def get_matrix(data, no_interaction):
     num_user = len(data['user'].unique())
