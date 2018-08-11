@@ -13,8 +13,10 @@
 ### [2. Results](#results)
 #### [a. Baseline Model](#baseline-model)
 #### [b. Linear Regression](#linear-regression)
-#### [c. Aritificial Neuronetwork](#arificial-neuronetwork)
-#### [d. Combined Model (baseline and neuronetwork)](#combined-model)
+#### [c. Lasso](#lasso)
+#### [d. Gradient Boosted Trees](#gradient-boosted-trees)
+#### [e. Aritificial Neuronetwork](#arificial-neuronetwork)
+#### [f. Combined Model (baseline and neuronetwork)](#combined-model)
 
 ### Summary
 First, we split the sample dataset into a Playlist Bank and a Training set. For each playlist in the Training Set, we hide one track to be the track that we try to predict, and we set the rest as our predictors.
@@ -49,11 +51,11 @@ The first issue we identified with this model were the outliers. The top playlis
 
 The next linear regression model included all of the variables from the previous model but also included the ‘popular artist variable which was hot encoded. We saw improvement to the model, with new score equal 0.037
 
-##### Lasso
+#### Lasso
 
 We also ran a Lasso model with the regularization parameter equal to 0.5 which showed that the number of parameters is not an issue in our linear regression model, since our accuracy score with LASSO was -0.43.
 
-##### Gradient Boosted Trees
+#### Gradient Boosted Trees
 
 Our Gradient Boosted Model included a max depth of 10, learning rate equal to 0.1 and 60 estimators. The accuracy score of this model on train data is 0.67, however the score is negative on test data, -11.1478, which shows that is having overfitting issues. The large number of trees can be one problem with it. 
 
