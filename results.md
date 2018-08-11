@@ -23,14 +23,14 @@ To achieve the final playlist generation model, we combined a Neural Network mod
 
 Our final model improves on the previous model performance (linear regression, Lasso regression, and Gradient Boosted Trees), by improving the predictive performance or in the case of GBT, primarily addressing the issue of overfitting identified in them. Below we elaborate on the models used and conclusions from each one of them.
 
-![results_01](https://heli18.github.io/CS109_Spotifier/images/Results1.JPG)
+![results_01](https://heli18.github.io/CS109_Spotifier/images/Results1.jpg)
 
 ### Results
 
 #### Baseline Model
 The baseline model is based on comparing each pair of “tracks” and hence computing the “similarity score” by using the 'Jaccard similarity' similarity measurement:The dataset we use in baseline model is the full dataset(10,000) playlist.
 
-![results_02](https://heli18.github.io/CS109_Spotifier/images/Results2.JPG)
+![results_02](https://heli18.github.io/CS109_Spotifier/images/Results2.jpg)
 
 For each playlist in the Training Set, we hide one track to be the track that we try to predict, and we set the rest as our predictors. For each training list, if the hidden track exists in our prediction track list, we will define the error rate of this training list to 0, otherwise, to 1. And we average the total error of 500 playlists to be our total error rate.
 
@@ -63,15 +63,15 @@ Our artificial neural network is based on He et al (2017). The 1 Million playlis
 
 We put the data in the matrix format illustrated below. Each row of the matrix represents the user (playlist) and each column of matrix represent the items (tracks). The value of the matrix is the "interaction". We mark "1" as the interaction of user and item exist and 0 otherwise. 
 
-![results_03](https://heli18.github.io/CS109_Spotifier/images/Results3.JPG)
+![results_03](https://heli18.github.io/CS109_Spotifier/images/Results3.jpg)
 
 Matrix Factorization (MF) associates each user and item with a real-valued vector of latent features. It is shown below. The latent features are presented in the right handside of the above figures as compared with the matrix. As the research of Neural Collaborative Filtering indicated, there are some differences between "Jaccard similarity" and the "matrix factorization": in matrix, the u4 is most similar to u1, followed by u3 and u2 while in MF, the P4 is similar to P1, followed by P2 and P3 which indicated the "ranking lost" of MF. This could be one of the sources of the model limitations.
 
-![results_04](https://heli18.github.io/CS109_Spotifier/images/Results4.JPG)
+![results_04](https://heli18.github.io/CS109_Spotifier/images/Results4.jpg)
 
 Our neural network aimed to estimate the function to predict the y_hat(ui). The input layer includes two datasets: the "user" and "track". The second layer is the embedding layer with user latent vector and tracks latent vector. And we added other layers in neural network to tune our predictions. The output layer is the predicted "interaction" ('y' in dataset). The prediction score is a probability ranged from 0 to 1. The probability indicated the likelihood of the interactions between the playlist and track. The higher the probability, the more likely that the user will like the track.
 
-![results_05](https://heli18.github.io/CS109_Spotifier/images/Results5.JPG)
+![results_05](https://heli18.github.io/CS109_Spotifier/images/Results5.jpg)
 
 #### Combined Model
 
