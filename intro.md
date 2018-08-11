@@ -31,31 +31,31 @@ The Million Playlist dataset had more unnecessary metadata which we cleaned in t
 
 Million Playlist dataset format:
 ```python
-“playlists”: [
+"playlists": [
 	 {
-		 “name”: “Throwbacks”,
-		 “collaborative”: “false”,
-		 “pid”: 0, (remove)
-		 “modified_at”: 1493424000, (remove)
-		 “num_tracks”: 52,
-		 “num_albums”: 47,
-		 “num_followers”: 1,
-		 “num_edits”: 6,
-		 “duration_ms”: 11532414, (remove)
-		 “num_artists”: 37,
-		 “durantion_ms_mean”: ‘float’ (add)
-		 “popular_artist”: ‘str’ (add)
-		 “popular_album”: ‘str’ (add)
-		 “tracks”: [
+		 "name": "Throwbacks",
+		 "collaborative": "false",
+		 "pid": 0, (remove)
+		 "modified_at": 1493424000, (remove)
+		 "num_tracks": 52,
+		 "num_albums": 47,
+		 "num_followers": 1,
+		 "num_edits": 6,
+		 "duration_ms": 11532414, (remove)
+		 "num_artists": 37,
+		 "durantion_ms_mean": ‘float’ (add)
+		 "popular_artist": ‘str’ (add)
+		 "popular_album": ‘str’ (add)
+		 "tracks": [
 			 {
-				 “pos”: 0, (remove)
-				 “artist_name”: “Missy Elliott”,
-				 “track_uri”: “spotify:track:0UaMYEvWZi0ZqiDOoHU3YI”, (remove)
-				 “artist_uri”: “spotify:artist:2wIVse2owClT7go1WT98tk”, (remove)
-				 “track_name”: “Lose Control (feat. Ciara & Fat Man Scoop)“,
-				 “album_uri”: “spotify:album:6vV5UrXcfyQD1wu4Qo2I9K”, (remove)
-				 “duration_ms”: 226863,
-				 “album_name”: “The Cookbook”
+				 "pos": 0, (remove)
+				 "artist_name": "Missy Elliott",
+				 "track_uri": "spotify:track:0UaMYEvWZi0ZqiDOoHU3YI", (remove)
+				 "artist_uri": "spotify:artist:2wIVse2owClT7go1WT98tk", (remove)
+				 "track_name": "Lose Control (feat. Ciara & Fat Man Scoop)",
+				 "album_uri": "spotify:album:6vV5UrXcfyQD1wu4Qo2I9K", (remove)
+				 "duration_ms": 226863,
+				 "album_name": "The Cookbook"
 		 	},
 		 	...
 		 ]
