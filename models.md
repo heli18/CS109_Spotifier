@@ -17,15 +17,15 @@ More information related to model training and performance can be found on the [
 
 ### [2. Baseline Model](#baseline-model)
 
-### [3. Linear regression](#linear-regression)
+### [3. Linear Regression](#linear-regression)
 
-#### Linear regression / Linear regression with encoded variables
-#### Lasso
-#### Gradient Boosted Trees
+### [4. Lasso](#lasso)
 
-### [4. Artificial neuronetwork](#artificial-neuronetwork)
+### [5. Gradient Boosted Trees](#gradient-boosted-trees)
 
-### [5. Combined model](#combined-model)
+### [6. Artificial neuronetwork](#artificial-neuronetwork)
+
+### [7. Combined model](#combined-model)
 Combine baseline and advanced model together to generate the final recommendation list.
 
 ### Reading and Cleaning Data
@@ -174,7 +174,6 @@ The score is 0.166
 ```
 ### Linear Regression
 
-#### Linear regression / Linear regression with encoded variables
 ``` python
 # # Alloc all playlists as array of dictionaries
 all_playlists = []
@@ -437,7 +436,7 @@ Coefficients: [-9.41829635e-02  5.25917963e+02 -1.79569798e-01 ... -4.49115342e+
 
 Accuracy Score(Train): 0.037381214596123535
 ```
-#### Lasso
+### Lasso
 ```python
 # use LASSO
 las = Lasso(alpha=0.5)
@@ -460,7 +459,7 @@ Coefficients: [-0.00000000e+00 -3.10942535e-05 -5.78218784e-02 ... -0.00000000e+
 Accuracy Score(Train): 0.03539105570048673
 ```
 
-#### Gradient Boosted Trees
+### Gradient Boosted Trees
 ```python
 xgbr = xgb.XGBRegressor(max_depth=10, 
                         learning_rate=0.1, 
