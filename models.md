@@ -800,3 +800,32 @@ The minimum test score is 0.5
 ```
 
 ### Combined Model
+
+```python
+recom_list_combine = recommendation_list.copy()
+recommendation_scores = np.zeros(len(track_hide))
+for x in range(len(track_hide)):
+    track_full_list = list(set(recom_list_combine[x]))
+    existing_track = data_train[data_train['user'] == x].track
+    hidden_track = list(track_test)[x*2]
+    predict_track = list(Counter(track_full_list)-Counter(existing_track))
+    predict_user = np.zeros(len(predict_track))+x
+    
+    s = NNmodel.predict([np.array(x).reshape(-1,1), np.array(hidden_track).reshape(-1,1)])
+    #print('score is {}'.format(s))
+    
+    predictions = np.transpose(NNmodel.predict([predict_user, np.array(predict_track)]))[0]
+    index = np.argsort(predictions)[-no_recommendation:]
+
+    recommendation_list_ann = np.array(predict_track)[index]
+    
+    if hidden_track in recommendation_list_ann:
+        recommendation_scores[x] = 1
+        
+total_score = np.average(recommendation_scores)
+print('For {} percent of time, we successfully include the hidden track'.format(round(total_score*100)))
+```
+
+```
+For 26.0 percent of time, we successfully include the hidden track
+```
